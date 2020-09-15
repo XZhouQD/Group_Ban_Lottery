@@ -1,13 +1,51 @@
 #!/usr/bin/python3
 
-import nonebot
+from nonebot import on_command, CommandSession, permission, on_startup, log, get_bot
 from aiocqhttp.exceptions import Error as CQHTTPError
+import random
 
 """
 Group Ban Lottery Plugin
 A Nonebot Plugin
 
 Version:
-0.1.0-Alpha
+0.1.0-Beta
 """
+#Available Groups
+ENABLE_GROUPS=[111111111,22222222]
 
+
+@on_command('lottery', aliases=('抽奖'), permission=permission.GROUP_MEMBER, only_to_me=False)
+async def lottery(session: CommandSession):
+    bot = get_bot()
+    group = session.event.group_id
+    if group is None or group not in ENABLE_GROUPS:
+        return
+    user = session.event['user_id']
+
+    level = random.randint(1, 100)
+    if level < 50:
+        length = random.randint(1, 1440)
+    elif level < 80:
+        length = random.randint(1401, 2880)
+    elif level < 99:
+        length = random.randint(2801, 4320)
+    elif level < 100:
+        length = random.randint(4320, 7200)
+    else:
+        length = 30*24*60
+    try:
+        log.logger.info(f"[GB_Lottery]{group}, {user}, {length}")
+        await bot.set_group_ban(group_id=group, user_id=user, duration=length * 60)
+    except CQHTTPError:
+        pass
+    try:
+        message = f"抽奖成功！！你抽中的是{length}分钟禁言套餐！"
+        await session.send(message, at_sender=True)
+    except CQHTTPError:
+        pass
+
+
+@lottery.args_parser
+async def _(session: CommandSession):
+    pass
