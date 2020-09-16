@@ -9,10 +9,12 @@ Group Ban Lottery Plugin
 A Nonebot Plugin
 
 Version:
-0.2.0-Beta
+0.2.1-Beta
 """
-#Available Groups
-ENABLE_GROUPS=[111111111,22222222]
+
+# Available Groups
+ENABLE_GROUPS = [111111111, 22222222]
+
 
 def get_length():
     level = random.randint(1, 100)
@@ -78,9 +80,9 @@ async def give_lottery(session: CommandSession):
 @give_lottery.args_parser
 async def give_lottery_parser(session: CommandSession):
     stripped_arg = session.current_arg.strip()
-    at = session.get
 
     if session.is_first_run:
         if stripped_arg:
             session.state['target'] = int(stripped_arg.split('=')[1][:-1])
-        return
+
+    return
